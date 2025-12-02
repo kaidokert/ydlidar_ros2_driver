@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
   node->declare_parameter("port", str_optvalue);
   node->get_parameter("port", str_optvalue);
   ///lidar port
-  laser.setSerialPort(str_optvalue);
+  laser.setlidaropt(LidarPropSerialPort, str_optvalue.c_str(), str_optvalue.size());
 
   ///ignore array
   str_optvalue = "";
@@ -52,7 +52,8 @@ int main(int argc, char *argv[]) {
   node->get_parameter("ignore_array", str_optvalue);
   std::vector<float> ignore_array;
   // Parse ignore array string if needed
-  laser.setIgnoreArray(ignore_array);
+  // Note: setIgnoreArray removed in new SDK, handled differently
+  // laser.setlidaropt(LidarPropIgnoreArray, ...);
 
   std::string frame_id = "laser_frame";
   node->declare_parameter("frame_id", frame_id);
@@ -63,104 +64,99 @@ int main(int argc, char *argv[]) {
   int optval = 230400;
   node->declare_parameter("baudrate", optval);
   node->get_parameter("baudrate", optval);
-  laser.setSerialBaudrate(optval);
+  laser.setlidaropt(LidarPropSerialBaudrate, &optval, sizeof(int));
   /// tof lidar
   optval = TYPE_TRIANGLE;
   node->declare_parameter("lidar_type", optval);
   node->get_parameter("lidar_type", optval);
-  laser.setLidarType(optval);
+  laser.setlidaropt(LidarPropLidarType, &optval, sizeof(int));
   /// device type
-  // NOTE: setDeviceType() removed in latest SDK - serial is default
-  optval = 0; // YDLIDAR_TYPE_SERIAL equivalent
+  optval = YDLIDAR_TYPE_SERIAL;
   node->declare_parameter("device_type", optval);
   node->get_parameter("device_type", optval);
-  // laser.setDeviceType(optval); // Method doesn't exist in new SDK
+  laser.setlidaropt(LidarPropDeviceType, &optval, sizeof(int));
   /// sample rate
   optval = 9;
   node->declare_parameter("sample_rate", optval);
   node->get_parameter("sample_rate", optval);
-  laser.setSampleRate(optval);
+  laser.setlidaropt(LidarPropSampleRate, &optval, sizeof(int));
   /// abnormal count
   optval = 4;
   node->declare_parameter("abnormal_check_count", optval);
   node->get_parameter("abnormal_check_count", optval);
-  laser.setAbnormalCheckCount(optval);
+  laser.setlidaropt(LidarPropAbnormalCheckCount, &optval, sizeof(int));
 
   /// Intenstiy bit count
-  // NOTE: setIntensityBit() removed in latest SDK
   optval = 0;
   node->declare_parameter("intensity_bit", optval);
   node->get_parameter("intensity_bit", optval);
-  // laser.setIntensityBit(optval); // Method doesn't exist in new SDK
+  laser.setlidaropt(LidarPropIntenstiyBit, &optval, sizeof(int));
      
   //////////////////////bool property/////////////////
   /// fixed angle resolution
   bool b_optvalue = false;
   node->declare_parameter("fixed_resolution", b_optvalue);
   node->get_parameter("fixed_resolution", b_optvalue);
-  laser.setFixedResolution(b_optvalue);
+  laser.setlidaropt(LidarPropFixedResolution, &b_optvalue, sizeof(bool));
   /// rotate 180
   b_optvalue = true;
   node->declare_parameter("reversion", b_optvalue);
   node->get_parameter("reversion", b_optvalue);
-  laser.setReversion(b_optvalue);
+  laser.setlidaropt(LidarPropReversion, &b_optvalue, sizeof(bool));
   /// Counterclockwise
   b_optvalue = true;
   node->declare_parameter("inverted", b_optvalue);
   node->get_parameter("inverted", b_optvalue);
-  laser.setInverted(b_optvalue);
+  laser.setlidaropt(LidarPropInverted, &b_optvalue, sizeof(bool));
   b_optvalue = true;
   node->declare_parameter("auto_reconnect", b_optvalue);
   node->get_parameter("auto_reconnect", b_optvalue);
-  laser.setAutoReconnect(b_optvalue);
+  laser.setlidaropt(LidarPropAutoReconnect, &b_optvalue, sizeof(bool));
   /// one-way communication
   b_optvalue = false;
   node->declare_parameter("isSingleChannel", b_optvalue);
   node->get_parameter("isSingleChannel", b_optvalue);
-  laser.setSingleChannel(b_optvalue);
+  laser.setlidaropt(LidarPropSingleChannel, &b_optvalue, sizeof(bool));
   /// intensity
-  // NOTE: setIntensity() removed in latest SDK - G4 doesn't support intensity anyway
   b_optvalue = false;
   node->declare_parameter("intensity", b_optvalue);
   node->get_parameter("intensity", b_optvalue);
-  // laser.setIntensity(b_optvalue); // Method doesn't exist in new SDK
+  laser.setlidaropt(LidarPropIntenstiy, &b_optvalue, sizeof(bool));
   /// Motor DTR
-  // NOTE: setSupportMotorDtrCtrl() removed in latest SDK
   b_optvalue = false;
   node->declare_parameter("support_motor_dtr", b_optvalue);
   node->get_parameter("support_motor_dtr", b_optvalue);
-  // laser.setSupportMotorDtrCtrl(b_optvalue); // Method doesn't exist in new SDK
-  //是否启用调试
-  // NOTE: setEnableDebug() removed in latest SDK
+  laser.setlidaropt(LidarPropSupportMotorDtrCtrl, &b_optvalue, sizeof(bool));
+  /// HeartBeat (debug equivalent)
   b_optvalue = false;
   node->declare_parameter("debug", b_optvalue);
   node->get_parameter("debug", b_optvalue);
-  // laser.setEnableDebug(b_optvalue); // Method doesn't exist in new SDK
+  laser.setlidaropt(LidarPropSupportHeartBeat, &b_optvalue, sizeof(bool));
 
   //////////////////////float property/////////////////
   /// unit: °
   float f_optvalue = 180.0f;
   node->declare_parameter("angle_max", f_optvalue);
   node->get_parameter("angle_max", f_optvalue);
-  laser.setMaxAngle(f_optvalue);
+  laser.setlidaropt(LidarPropMaxAngle, &f_optvalue, sizeof(float));
   f_optvalue = -180.0f;
   node->declare_parameter("angle_min", f_optvalue);
   node->get_parameter("angle_min", f_optvalue);
-  laser.setMinAngle(f_optvalue);
+  laser.setlidaropt(LidarPropMinAngle, &f_optvalue, sizeof(float));
   /// unit: m
   f_optvalue = 64.f;
   node->declare_parameter("range_max", f_optvalue);
   node->get_parameter("range_max", f_optvalue);
-  laser.setMaxRange(f_optvalue);
+  laser.setlidaropt(LidarPropMaxRange, &f_optvalue, sizeof(float));
   f_optvalue = 0.1f;
   node->declare_parameter("range_min", f_optvalue);
   node->get_parameter("range_min", f_optvalue);
-  laser.setMinRange(f_optvalue);
+  laser.setlidaropt(LidarPropMinRange, &f_optvalue, sizeof(float));
   /// unit: Hz
   f_optvalue = 10.f;
   node->declare_parameter("frequency", f_optvalue);
   node->get_parameter("frequency", f_optvalue);
-  laser.setScanFrequency(f_optvalue);
+  laser.setlidaropt(LidarPropScanFrequency, &f_optvalue, sizeof(float));
 
   bool invalid_range_is_inf = false;
   node->declare_parameter("invalid_range_is_inf", invalid_range_is_inf);
@@ -217,9 +213,8 @@ int main(int argc, char *argv[]) {
   while (ret && rclcpp::ok()) {
 
     LaserScan scan;//
-    bool hardwareError = false;
 
-    if (laser.doProcessSimple(scan, hardwareError)) {
+    if (laser.doProcessSimple(scan)) {
 
       auto scan_msg = std::make_shared<sensor_msgs::msg::LaserScan>();
       auto pc_msg = std::make_shared<sensor_msgs::msg::PointCloud>();
